@@ -100,7 +100,7 @@ GameUI.prototype.buildBoard = function () {
 		/*jshint loopfunc:true */
 		( function ( col ) {
 			$row.append(
-				$( '<th>' ).on( 'click', function () {
+				$( '<th>' ).attr( 'tabindex', 0 ).on( 'click keypress', function () {
 					that.board.players[ that.board.nextPlayerTurn ].clicked( col );
 				} )
 			);
