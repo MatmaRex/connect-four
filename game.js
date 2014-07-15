@@ -61,6 +61,9 @@ Game.prototype.begin = function ( player1, player2 ) {
 		moveInvalid: function ( column, board ) {
 			that.$gameTicker.text( 'Attempted invalid move: column ' + column + '.' );
 		},
+		gameOver: function ( player, board ) {
+			that.$gameTicker.text( 'Game over! And the winner is: ' + player.name + '!' );
+		}
 	} );
 	
 	this.emptyColumnCells = [];
@@ -116,6 +119,9 @@ function Board( player1, player2, callbacks ) {
 	this.rows = 6;
 	
 	this.data = [];
+	for ( var i = 0; i < this.columns; i++ ) {
+		this.data[i] = [];
+	}
 	
 	this.callbacks = $.extend( {
 		moveCompleted: $.noop,
@@ -136,8 +142,73 @@ Board.prototype.nextTurn = function () {
 			that.callbacks.moveInvalid( column, that );
 		}
 		
-		that.nextTurn();
+		if ( that.isGameOver() ) {
+			that.callbacks.gameOver( that.getWinner(), that );
+		} else {
+			that.nextTurn();
+		}
 	} );
+};
+
+// The game is over if one of the players connected four or there is no more space to place dots.
+Board.prototype.isGameOver = function () {
+	var that = this;
+	return !!this.getWinner() || this.data.every( function ( val ) {
+		return val.length === that.rows;
+	} );
+};
+
+Board.prototype.getWinner = function () {
+	return this.findHorizontalFour() || this.findVerticalFour() || this.findDiagonalFour();
+};
+
+// Returns a player who has a horizontal four on board, or null.
+Board.prototype.findHorizontalFour = function () {
+	for ( var row = 0; row < this.rows; row++ ) {
+		for ( var startColumn = 0; startColumn < this.columns - 4; startColumn++ ) {
+			var color = this.data[startColumn][row];
+			if ( color === undefined ) {
+				continue;
+			}
+			
+			if (
+				this.data[startColumn][row] === color &&
+				this.data[startColumn+1][row] === color &&
+				this.data[startColumn+2][row] === color &&
+				this.data[startColumn+3][row] === color
+			) {
+				return color;
+			}
+		}
+	}
+	return null;
+};
+
+// Returns a player who has a vertical four on board, or null.
+Board.prototype.findVerticalFour = function () {
+	for ( var startRow = 0; startRow < this.rows - 4; startRow++ ) {
+		for ( var column = 0; column < this.columns; column++ ) {
+			var color = this.data[column][startRow];
+			if ( color === undefined ) {
+				continue;
+			}
+			
+			if (
+				this.data[column][startRow] === color &&
+				this.data[column][startRow+1] === color &&
+				this.data[column][startRow+2] === color &&
+				this.data[column][startRow+3] === color
+			) {
+				return color;
+			}
+		}
+	}
+	return null;
+};
+
+// Returns a player who has a diagonal four on board, or null.
+Board.prototype.findDiagonalFour = function () {
+	// TODO
 };
 
 // Current player places a disc into the given column.
@@ -145,10 +216,6 @@ Board.prototype.nextTurn = function () {
 Board.prototype.performMove = function ( column ) {
 	if ( column < 0 || column > this.columns ) {
 		return false;
-	}
-	
-	if ( !this.data[column] ) {
-		this.data[column] = [];
 	}
 	
 	// Is this column already full?
@@ -160,8 +227,9 @@ Board.prototype.performMove = function ( column ) {
 	return true;
 };
 
-function HumanPlayer( id ) {
+function HumanPlayer( id, name ) {
 	this.id = id;
+	this.name = name;
 	this.currentDeferred = null;
 }
 
@@ -176,8 +244,9 @@ HumanPlayer.prototype.clicked = function ( column ) {
 	}
 };
 
-function AIPlayer( id ) {
+function AIPlayer( id, name ) {
 	this.id = id;
+	this.name = name;
 }
 
 AIPlayer.prototype.takeTurn = function ( board ) {
