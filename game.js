@@ -60,7 +60,7 @@ GameUI.prototype.begin = function ( player1, player2 ) {
 	this.board = new Board( player1, player2, {
 		moveCompleted: function ( column, player, board ) {
 			that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + player.id );
-			that.$gameTicker.text( 'Now playing: ' + board.players[ board.nextPlayerTurn ].name + '.' );
+			that.$gameTicker.text( 'Now playing: ' + board.getNextPlayer().name + '.' );
 		},
 		moveInvalid: function ( column, player, board ) {
 			that.$gameTicker.text( player.name + ' attempted invalid move: column ' + column + '.' );
@@ -83,7 +83,7 @@ GameUI.prototype.begin = function ( player1, player2 ) {
 	this.emptyColumnCells = [];
 	this.buildBoard();
 	
-	this.$gameTicker.text( 'Now playing: ' + this.board.players[ this.board.nextPlayerTurn ].name + '.' );
+	this.$gameTicker.text( 'Now playing: ' + this.board.getNextPlayer().name + '.' );
 	this.board.nextTurn();
 };
 
@@ -101,7 +101,7 @@ GameUI.prototype.buildBoard = function () {
 		( function ( col ) {
 			$row.append(
 				$( '<th>' ).attr( 'tabindex', 0 ).on( 'click keypress', function () {
-					that.board.players[ that.board.nextPlayerTurn ].clicked( col );
+					that.board.getNextPlayer().clicked( col );
 				} )
 			);
 		} )( j );
@@ -151,14 +151,19 @@ function Board( player1, player2, callbacks ) {
 	this.nextPlayerTurn = 0;
 }
 
+// Returns a player object for the player whose move will be recorded next.
+Board.prototype.getNextPlayer = function () {
+	return this.players[ this.nextPlayerTurn ];
+};
+
 // Starts next turn.
 // 
 // When the turn is finished, game over conditions are checked and the game stops or another turn
 // is started.
 Board.prototype.nextTurn = function () {
 	var that = this;
-	this.players[ this.nextPlayerTurn ].takeTurn( this ).done( function ( column ) {
-		var currentPlayer = that.players[ that.nextPlayerTurn ];
+	this.getNextPlayer().takeTurn( this ).done( function ( column ) {
+		var currentPlayer = that.getNextPlayer();
 		if ( that.performMove( column ) ) {
 			that.nextPlayerTurn = ( that.nextPlayerTurn + 1 ) % 2;
 			that.callbacks.moveCompleted( column, currentPlayer, that );
@@ -282,7 +287,7 @@ Board.prototype.performMove = function ( column ) {
 		return false;
 	}
 	
-	this.data[column].push( this.players[ this.nextPlayerTurn ] );
+	this.data[column].push( this.getNextPlayer() );
 	return true;
 };
 
