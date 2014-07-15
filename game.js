@@ -38,7 +38,7 @@ GameUI.prototype.setUp = function () {
 		var name2 = $name2.val();
 		
 		if ( !name1 || !name2 || name1 === name2 ) {
-			$errorMessage.text( 'You must provide unique name for both players, dummy!' );
+			$errorMessage.text( 'You must provide unique name for both players.' );
 			return;
 		}
 		
