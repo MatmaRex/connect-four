@@ -29,6 +29,14 @@ GameUI.prototype.setUp = function () {
 		$errorMessage
 	);
 	
+	// Resetting a game? Reuse current settings as defaults.
+	if ( this.board ) {
+		$name1.val( this.board.players[0].name );
+		$name2.val( this.board.players[1].name );
+		$type1[0].selectedIndex = this.board.players[0] instanceof AIPlayer ? 1 : 0;
+		$type2[0].selectedIndex = this.board.players[1] instanceof AIPlayer ? 1 : 0;
+	}
+	
 	this.$element.append( $form );
 	
 	$form.on( 'submit', function ( e ) {
