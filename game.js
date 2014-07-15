@@ -156,7 +156,7 @@ Board.prototype.performMove = function ( column ) {
 		return false;
 	}
 	
-	this.data[column].push( this.nextPlayerTurn );
+	this.data[column].push( this.players[ this.nextPlayerTurn ] );
 	return true;
 };
 
