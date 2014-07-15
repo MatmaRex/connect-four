@@ -1,4 +1,4 @@
-/*global $, console */
+/*global $ */
 
 // Controls the HTML user interface.
 function GameUI( $element ) {
