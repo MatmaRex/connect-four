@@ -169,7 +169,7 @@ Board.prototype.getWinner = function () {
 // Returns a player who has a horizontal four on board, or null.
 Board.prototype.findHorizontalFour = function () {
 	for ( var row = 0; row < this.rows; row++ ) {
-		for ( var startColumn = 0; startColumn < this.columns - 4; startColumn++ ) {
+		for ( var startColumn = 0; startColumn < this.columns - 3; startColumn++ ) {
 			var color = this.data[startColumn][row];
 			if ( color === undefined ) {
 				continue;
@@ -190,7 +190,7 @@ Board.prototype.findHorizontalFour = function () {
 
 // Returns a player who has a vertical four on board, or null.
 Board.prototype.findVerticalFour = function () {
-	for ( var startRow = 0; startRow < this.rows - 4; startRow++ ) {
+	for ( var startRow = 0; startRow < this.rows - 3; startRow++ ) {
 		for ( var column = 0; column < this.columns; column++ ) {
 			var color = this.data[column][startRow];
 			if ( color === undefined ) {
