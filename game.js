@@ -54,12 +54,12 @@ Game.prototype.setUp = function () {
 Game.prototype.begin = function ( player1, player2 ) {
 	var that = this;
 	this.board = new Board( player1, player2, {
-		moveCompleted: function ( column, board ) {
-			that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + board.nextPlayerTurn );
-			that.$gameTicker.empty();
+		moveCompleted: function ( column, player, board ) {
+			that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + player.id );
+			that.$gameTicker.text( 'Now playing: ' + board.players[ board.nextPlayerTurn ].name + '.' );
 		},
-		moveInvalid: function ( column, board ) {
-			that.$gameTicker.text( 'Attempted invalid move: column ' + column + '.' );
+		moveInvalid: function ( column, player, board ) {
+			that.$gameTicker.text( player.name + ' attempted invalid move: column ' + column + '.' );
 		},
 		gameOver: function ( player, board ) {
 			if ( player ) {
@@ -73,6 +73,7 @@ Game.prototype.begin = function ( player1, player2 ) {
 	this.emptyColumnCells = [];
 	this.buildBoard();
 	
+	this.$gameTicker.text( 'Now playing: ' + this.board.players[ this.board.nextPlayerTurn ].name + '.' );
 	this.board.nextTurn();
 };
 
@@ -139,11 +140,12 @@ function Board( player1, player2, callbacks ) {
 Board.prototype.nextTurn = function () {
 	var that = this;
 	this.players[ this.nextPlayerTurn ].takeTurn( this ).done( function ( column ) {
+		var currentPlayer = that.players[ that.nextPlayerTurn ];
 		if ( that.performMove( column ) ) {
-			that.callbacks.moveCompleted( column, that );
 			that.nextPlayerTurn = ( that.nextPlayerTurn + 1 ) % 2;
+			that.callbacks.moveCompleted( column, currentPlayer, that );
 		} else {
-			that.callbacks.moveInvalid( column, that );
+			that.callbacks.moveInvalid( column, currentPlayer, that );
 		}
 		
 		if ( that.isGameOver() ) {
