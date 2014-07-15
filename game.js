@@ -1,11 +1,11 @@
 /*global $, console */
 
-// Controls overall game state, like the players and turn progression.
-function Game( $element ) {
+// Controls the HTML user interface.
+function GameUI( $element ) {
 	this.$element = $element;
 }
 
-Game.prototype.setUp = function () {
+GameUI.prototype.setUp = function () {
 	var that = this;
 	
 	this.$element.empty();
@@ -53,7 +53,7 @@ Game.prototype.setUp = function () {
 	} );
 };
 
-Game.prototype.begin = function ( player1, player2 ) {
+GameUI.prototype.begin = function ( player1, player2 ) {
 	var that = this;
 	this.board = new Board( player1, player2, {
 		moveCompleted: function ( column, player, board ) {
@@ -85,7 +85,7 @@ Game.prototype.begin = function ( player1, player2 ) {
 	this.board.nextTurn();
 };
 
-Game.prototype.buildBoard = function () {
+GameUI.prototype.buildBoard = function () {
 	var that = this;
 	var $table, $row, $cell, i, j;
 
@@ -126,7 +126,10 @@ Game.prototype.buildBoard = function () {
 	this.$element.append( $table, this.$gameTicker );
 };
 
-// Controls game board state.
+// Controls game board state, including turn progression.
+// 
+// Fires callbacks when things happen. It could use some event-based system, but it's not really
+// worth it.
 function Board( player1, player2, callbacks ) {
 	this.columns = 7;
 	this.rows = 6;
