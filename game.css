@@ -11,3 +11,10 @@
 .game-board th {
 	background: gray;
 }
+
+.game-board .game-board-player-0 {
+	background: red;
+}
+.game-board .game-board-player-1 {
+	background: blue;
+}

@@ -2,7 +2,6 @@
 
 // Controls overall game state, like the players and turn progression.
 function Game( $element ) {
-	this.hasBegun = false;
 	this.$element = $element;
 }
 
@@ -40,8 +39,8 @@ Game.prototype.setUp = function () {
 			return;
 		}
 		
-		var type1 = $type1.val() == 'Human' ? HumanPlayer : AIPlayer;
-		var type2 = $type1.val() == 'Human' ? HumanPlayer : AIPlayer;
+		var type1 = $type1.val() === 'Human' ? HumanPlayer : AIPlayer;
+		var type2 = $type2.val() === 'Human' ? HumanPlayer : AIPlayer;
 		
 		that.$element.empty();
 		
@@ -53,16 +52,15 @@ Game.prototype.setUp = function () {
 };
 
 Game.prototype.begin = function ( player1, player2 ) {
-	this.hasBegun = true;
-	this.players = [ player1, player2 ];
-	this.nextPlayerTurn = 0;
-	this.board = new Board( function ( move ) {
-		console.log( move );
+	var that = this;
+	this.board = new Board( player1, player2, function ( column, board ) {
+		that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + board.nextPlayerTurn );
 	} );
 	
-	this.columnCells = [];
-	
+	this.emptyColumnCells = [];
 	this.buildBoard();
+	
+	this.board.nextTurn();
 };
 
 Game.prototype.buildBoard = function () {
@@ -78,7 +76,7 @@ Game.prototype.buildBoard = function () {
 		( function ( col ) {
 			$row.append(
 				$( '<th>' ).on( 'click', function () {
-					that.players[ that.nextPlayerTurn ].clicked( col );
+					that.board.players[ that.board.nextPlayerTurn ].clicked( col );
 				} )
 			);
 		} )( j );
@@ -91,9 +89,9 @@ Game.prototype.buildBoard = function () {
 		for ( j = 0; j < this.board.columns; j++ ) {
 			$cell = $( '<td>' );
 			if ( i === 0 ) {
-				this.columnCells[ j ] = [];
+				this.emptyColumnCells[ j ] = [];
 			}
-			this.columnCells[ j ].push( $cell );
+			this.emptyColumnCells[ j ].push( $cell );
 			
 			$row.append( $cell );
 		}
@@ -107,25 +105,53 @@ Game.prototype.buildBoard = function () {
 };
 
 // Controls game board state.
-function Board( turnCallback ) {
+function Board( player1, player2, moveCompletedCallback ) {
 	this.columns = 7;
 	this.rows = 6;
+	
+	this.data = [];
+	
+	this.moveCompletedCallback = moveCompletedCallback || $.noop;
+	
+	this.players = [ player1, player2 ];
+	this.nextPlayerTurn = 0;
 }
 
 Board.prototype.nextTurn = function () {
+	var that = this;
+	this.players[ this.nextPlayerTurn ].takeTurn( this ).done( function ( column ) {
+		that.performMove( column );
+		that.moveCompletedCallback( column, that );
+		
+		that.nextPlayerTurn = ( that.nextPlayerTurn + 1 ) % 2;
+		that.nextTurn();
+	} );
+};
+
+// Current player places a disc into the given column.
+Board.prototype.performMove = function ( column ) {
+	if ( !this.data[column] ) {
+		this.data[column] = [];
+	}
 	
+	this.data[column].push( this.nextPlayerTurn );
 };
 
 function HumanPlayer( id ) {
 	this.id = id;
+	this.currentDeferred = null;
 }
 
 HumanPlayer.prototype.takeTurn = function ( board ) {
-	
+	this.currentDeferred = $.Deferred();
+	return this.currentDeferred;
 };
 
 HumanPlayer.prototype.clicked = function ( column ) {
-	
+	if ( this.currentDeferred ) {
+		this.currentDeferred.resolve( column );
+		this.currentDeferred = null;
+	}
 };
 
 function AIPlayer( id ) {
@@ -133,9 +159,10 @@ function AIPlayer( id ) {
 }
 
 AIPlayer.prototype.takeTurn = function ( board ) {
-	
+	return $.Deferred().resolve( Math.floor( Math.random() * board.columns ) );
 };
 
 AIPlayer.prototype.clicked = function ( column ) {
-	
+	// Do nothing
+	return;
 };
