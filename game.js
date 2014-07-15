@@ -62,7 +62,11 @@ Game.prototype.begin = function ( player1, player2 ) {
 			that.$gameTicker.text( 'Attempted invalid move: column ' + column + '.' );
 		},
 		gameOver: function ( player, board ) {
-			that.$gameTicker.text( 'Game over! And the winner is: ' + player.name + '!' );
+			if ( player ) {
+				that.$gameTicker.text( 'Game over! And the winner is: ' + player.name + '!' );
+			} else {
+				that.$gameTicker.text( 'The game ended in a draw.' );
+			}
 		}
 	} );
 	
