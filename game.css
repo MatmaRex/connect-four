@@ -1,20 +1,41 @@
+body {
+	width: 300px;
+	margin: 0 auto;
+	padding: 10px;
+	font-family: sans-serif;
+}
+
 .game-board { 
 	empty-cells: show;
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: 1px solid black;
+	margin: 0 auto;
 }
 
 .game-board td, .game-board th {
 	width: 30px;
 	height: 30px;
-	border: 1px solid black;
+	background: center center no-repeat;
 }
 
 .game-board th {
-	background: gray;
+	background-image: url(images/arrow.png);
+	border-bottom: 1px solid black;
+	-webkit-transition: background-position 200ms;
+	-moz-transition: background-position 200ms;
+	transition: background-position 200ms;
+}
+.game-board th:hover {
+	background-position: center bottom;
 }
 
+.game-board td {
+	background-image: url(images/empty-cell.png);
+}
 .game-board .game-board-player-0 {
-	background: red;
+	background-image: url(images/red-cell.png);
 }
 .game-board .game-board-player-1 {
-	background: blue;
+	background-image: url(images/blue-cell.png);
 }
