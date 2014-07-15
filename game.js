@@ -299,7 +299,11 @@ function AIPlayer( id, name ) {
 
 AIPlayer.prototype.takeTurn = function ( board ) {
 	// Not a very smart opponent…
-	return $.Deferred().resolve( Math.floor( Math.random() * board.columns ) );
+	var deferred = $.Deferred();
+	setTimeout( function () {
+		deferred.resolve( Math.floor( Math.random() * board.columns ) );
+	}, 200 );
+	return deferred;
 };
 
 AIPlayer.prototype.clicked = function ( column ) {
