@@ -228,8 +228,8 @@ Board.prototype.findDiagonalFour = function () {
 	var that = this;
 	function checkDiagonalsInOneDirection( dir ) {
 		var i;
-		// Check top-right to bottom-left diagonals
-		for ( var firstCellColumn = 0; firstCellColumn < that.columns + that.rows; firstCellColumn++ ) {
+		var firstCellColumn = dir === -1 ? 0 : -that.rows;
+		for ( ; firstCellColumn < that.columns + that.rows; firstCellColumn++ ) {
 			var cells = [];
 			for ( i = 0; i < that.rows; i++ ) {
 				var col = firstCellColumn + ( i * dir );
