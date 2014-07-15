@@ -70,7 +70,9 @@ GameUI.prototype.begin = function ( player1, player2 ) {
 	var that = this;
 	this.board = new Board( player1, player2, {
 		moveCompleted: function ( column, player, board ) {
-			that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + player.id );
+			that.emptyColumnCells[column].pop()
+				.text( player.id )
+				.addClass( 'game-board-player-' + player.id );
 			that.$gameTicker.text( 'Now playing: ' + board.getNextPlayer().name + '.' );
 		},
 		moveInvalid: function ( column, player, board ) {
@@ -111,9 +113,13 @@ GameUI.prototype.buildBoard = function () {
 		/*jshint loopfunc:true */
 		( function ( col ) {
 			$row.append(
-				$( '<th>' ).attr( 'tabindex', 0 ).on( 'click keypress', function () {
-					that.board.getNextPlayer().clicked( col );
-				} )
+				$( '<th>' )
+					.attr( 'tabindex', 0 )
+					.attr( 'title', 'Place a disc in column ' + col )
+					.text( col )
+					.on( 'click keypress', function () {
+						that.board.getNextPlayer().clicked( col );
+					} )
 			);
 		} )( j );
 	}
@@ -123,7 +129,7 @@ GameUI.prototype.buildBoard = function () {
 	for ( i = 0; i < this.board.rows; i++ ) {
 		$row = $( '<tr>' );
 		for ( j = 0; j < this.board.columns; j++ ) {
-			$cell = $( '<td>' );
+			$cell = $( '<td>' ).text( '-' );
 			if ( i === 0 ) {
 				this.emptyColumnCells[ j ] = [];
 			}
