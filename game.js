@@ -8,6 +8,8 @@ function Game( $element ) {
 Game.prototype.setUp = function () {
 	var that = this;
 	
+	this.$element.empty();
+	
 	var $name1 = $( '<input type=text>' ).attr( 'placeholder', 'Player name' );
 	var $type1 = $( '<select>' ).append(
 		$( '<option>' ).text( 'Human' ),
@@ -67,6 +69,12 @@ Game.prototype.begin = function ( player1, player2 ) {
 			} else {
 				that.$gameTicker.text( 'The game ended in a draw.' );
 			}
+			
+			that.$gameTicker.after(
+				$( '<button>' ).text( 'Play again?' ).on( 'click', function () {
+					that.setUp();
+				} )
+			);
 		}
 	} );
 	
