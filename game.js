@@ -150,7 +150,6 @@ HumanPlayer.prototype.takeTurn = function ( board ) {
 HumanPlayer.prototype.clicked = function ( column ) {
 	if ( this.currentDeferred ) {
 		this.currentDeferred.resolve( column );
-		this.currentDeferred = null;
 	}
 };
 
