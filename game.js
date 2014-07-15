@@ -5,6 +5,7 @@ function GameUI( $element ) {
 	this.$element = $element;
 }
 
+// Creates a form that lets the user begin the game.
 GameUI.prototype.setUp = function () {
 	var that = this;
 	
@@ -53,6 +54,7 @@ GameUI.prototype.setUp = function () {
 	} );
 };
 
+// Begins the game. Sets up game board and internal objects, starts first turn.
 GameUI.prototype.begin = function ( player1, player2 ) {
 	var that = this;
 	this.board = new Board( player1, player2, {
@@ -85,6 +87,7 @@ GameUI.prototype.begin = function ( player1, player2 ) {
 	this.board.nextTurn();
 };
 
+// Build game board DOM.
 GameUI.prototype.buildBoard = function () {
 	var that = this;
 	var $table, $row, $cell, i, j;
@@ -148,6 +151,10 @@ function Board( player1, player2, callbacks ) {
 	this.nextPlayerTurn = 0;
 }
 
+// Starts next turn.
+// 
+// When the turn is finished, game over conditions are checked and the game stops or another turn
+// is started.
 Board.prototype.nextTurn = function () {
 	var that = this;
 	this.players[ this.nextPlayerTurn ].takeTurn( this ).done( function ( column ) {
@@ -175,6 +182,7 @@ Board.prototype.isGameOver = function () {
 	} );
 };
 
+// Returns the player object for the winner, or null if game isn't over or ended in a draw.
 Board.prototype.getWinner = function () {
 	return this.findHorizontalFour() || this.findVerticalFour() || this.findDiagonalFour();
 };
@@ -262,7 +270,7 @@ Board.prototype.findDiagonalFour = function () {
 	return checkDiagonalsInOneDirection( 1 ) || checkDiagonalsInOneDirection( -1 );
 };
 
-// Current player places a disc into the given column.
+// Checks if this move is correct and if so, places a disc for current played into the given column.
 // Returns whether the move was valid.
 Board.prototype.performMove = function ( column ) {
 	if ( column < 0 || column > this.columns ) {
@@ -278,28 +286,34 @@ Board.prototype.performMove = function ( column ) {
 	return true;
 };
 
+// Encapsulates a human player.
 function HumanPlayer( id, name ) {
 	this.id = id;
 	this.name = name;
 	this.currentDeferred = null;
 }
 
+// Allows the user to input their move using the game board.
 HumanPlayer.prototype.takeTurn = function ( board ) {
 	this.currentDeferred = $.Deferred();
 	return this.currentDeferred;
 };
 
+// Game board UI callback. Registers user's move in the clicked column.
 HumanPlayer.prototype.clicked = function ( column ) {
 	if ( this.currentDeferred ) {
 		this.currentDeferred.resolve( column );
 	}
 };
 
+// Encapsulates a computer player.
 function AIPlayer( id, name ) {
 	this.id = id;
 	this.name = name;
 }
 
+// Inputs computer player's move. This is done after a delay of 200 ms to feel more natural to
+// humans playing or watching the game.
 AIPlayer.prototype.takeTurn = function ( board ) {
 	// Not a very smart opponent…
 	var deferred = $.Deferred();
@@ -309,7 +323,7 @@ AIPlayer.prototype.takeTurn = function ( board ) {
 	return deferred;
 };
 
+// Game board UI callback. Does nothing, obviously.
 AIPlayer.prototype.clicked = function ( column ) {
-	// Do nothing
 	return;
 };
