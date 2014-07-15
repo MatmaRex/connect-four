@@ -25,7 +25,7 @@ GameUI.prototype.setUp = function () {
 	var $form = $( '<form>' ).append(
 		$( '<p>' ).append( 'Player 1: ', $name1, ' ', $type1 ),
 		$( '<p>' ).append( 'Player 2: ', $name2, ' ', $type2 ),
-		$( '<input type=submit>' ),
+		$( '<input type=submit>' ).val( 'Play!' ),
 		$errorMessage
 	);
 	

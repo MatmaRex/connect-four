@@ -1,8 +1,16 @@
 body {
-	width: 300px;
+	width: 320px;
 	margin: 0 auto;
 	padding: 10px;
 	font-family: sans-serif;
+}
+
+.error {
+	border: 1px solid red;
+	padding: 1em;
+}
+.error:empty {
+	display: none;
 }
 
 .game-board { 
