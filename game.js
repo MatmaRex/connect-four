@@ -20,13 +20,10 @@ GameUI.prototype.setUp = function () {
 	var $name2 = $name1.clone();
 	var $type2 = $type1.clone();
 	
-	var $errorMessage = $( '<p>' ).addClass( 'error' );
-	
 	var $form = $( '<form>' ).append(
 		$( '<p>' ).append( 'Player 1: ', $name1, ' ', $type1 ),
 		$( '<p>' ).append( 'Player 2: ', $name2, ' ', $type2 ),
-		$( '<input type=submit>' ).val( 'Play!' ),
-		$errorMessage
+		$( '<input type=submit>' ).val( 'Play!' )
 	);
 	
 	// Resetting a game? Reuse current settings as defaults.
@@ -43,15 +40,21 @@ GameUI.prototype.setUp = function () {
 		e.preventDefault();
 		
 		var name1 = $name1.val();
-		var name2 = $name2.val();
-		
-		if ( !name1 || !name2 || name1 === name2 ) {
-			$errorMessage.text( 'You must provide unique name for both players.' );
-			return;
-		}
-		
 		var type1 = $type1.val() === 'Human' ? HumanPlayer : AIPlayer;
+		var name2 = $name2.val();
 		var type2 = $type2.val() === 'Human' ? HumanPlayer : AIPlayer;
+		
+		// If a name isn't provided, use "Human", "Human 1", "Human 2", "Computer", …
+		if ( !name1 ) {
+			name1 = $type1.val();
+		}
+		if ( !name2 ) {
+			name2 = $type2.val();
+		}
+		if ( name1 === name2 ) {
+			name1 += ' 1';
+			name2 += ' 2';
+		}
 		
 		that.$element.empty();
 		
