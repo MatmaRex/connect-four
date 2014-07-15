@@ -53,8 +53,14 @@ Game.prototype.setUp = function () {
 
 Game.prototype.begin = function ( player1, player2 ) {
 	var that = this;
-	this.board = new Board( player1, player2, function ( column, board ) {
-		that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + board.nextPlayerTurn );
+	this.board = new Board( player1, player2, {
+		moveCompleted: function ( column, board ) {
+			that.emptyColumnCells[column].pop().addClass( 'game-board-player-' + board.nextPlayerTurn );
+			that.$gameTicker.empty();
+		},
+		moveInvalid: function ( column, board ) {
+			that.$gameTicker.text( 'Attempted invalid move: column ' + column + '.' );
+		},
 	} );
 	
 	this.emptyColumnCells = [];
@@ -65,7 +71,7 @@ Game.prototype.begin = function ( player1, player2 ) {
 
 Game.prototype.buildBoard = function () {
 	var that = this;
-	var $table, $row, $cell, i, j, $summary;
+	var $table, $row, $cell, i, j;
 
 	$table = $( '<table>' ).addClass( 'game-board' );
 	
@@ -99,19 +105,22 @@ Game.prototype.buildBoard = function () {
 		$table.append( $row );
 	}
 	
-	$summary = $( '<p>' );
+	this.$gameTicker = $( '<p>' );
 	
-	this.$element.append( $table, $summary );
+	this.$element.append( $table, this.$gameTicker );
 };
 
 // Controls game board state.
-function Board( player1, player2, moveCompletedCallback ) {
+function Board( player1, player2, callbacks ) {
 	this.columns = 7;
 	this.rows = 6;
 	
 	this.data = [];
 	
-	this.moveCompletedCallback = moveCompletedCallback || $.noop;
+	this.callbacks = $.extend( {
+		moveCompleted: $.noop,
+		moveInvalid: $.noop
+	}, callbacks );
 	
 	this.players = [ player1, player2 ];
 	this.nextPlayerTurn = 0;
@@ -120,21 +129,35 @@ function Board( player1, player2, moveCompletedCallback ) {
 Board.prototype.nextTurn = function () {
 	var that = this;
 	this.players[ this.nextPlayerTurn ].takeTurn( this ).done( function ( column ) {
-		that.performMove( column );
-		that.moveCompletedCallback( column, that );
+		if ( that.performMove( column ) ) {
+			that.callbacks.moveCompleted( column, that );
+			that.nextPlayerTurn = ( that.nextPlayerTurn + 1 ) % 2;
+		} else {
+			that.callbacks.moveInvalid( column, that );
+		}
 		
-		that.nextPlayerTurn = ( that.nextPlayerTurn + 1 ) % 2;
 		that.nextTurn();
 	} );
 };
 
 // Current player places a disc into the given column.
+// Returns whether the move was valid.
 Board.prototype.performMove = function ( column ) {
+	if ( column < 0 || column > this.columns ) {
+		return false;
+	}
+	
 	if ( !this.data[column] ) {
 		this.data[column] = [];
 	}
 	
+	// Is this column already full?
+	if ( this.data[column].length === this.rows ) {
+		return false;
+	}
+	
 	this.data[column].push( this.nextPlayerTurn );
+	return true;
 };
 
 function HumanPlayer( id ) {
@@ -158,6 +181,7 @@ function AIPlayer( id ) {
 }
 
 AIPlayer.prototype.takeTurn = function ( board ) {
+	// Not a very smart opponent…
 	return $.Deferred().resolve( Math.floor( Math.random() * board.columns ) );
 };
 
