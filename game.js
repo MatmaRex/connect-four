@@ -212,7 +212,41 @@ Board.prototype.findVerticalFour = function () {
 
 // Returns a player who has a diagonal four on board, or null.
 Board.prototype.findDiagonalFour = function () {
-	// TODO
+	var that = this;
+	function checkDiagonalsInOneDirection( dir ) {
+		var i;
+		// Check top-right to bottom-left diagonals
+		for ( var firstCellColumn = 0; firstCellColumn < that.columns + that.rows; firstCellColumn++ ) {
+			var cells = [];
+			for ( i = 0; i < that.rows; i++ ) {
+				var col = firstCellColumn + ( i * dir );
+				var row = i;
+				if ( col >= 0 && col < that.columns && row >= 0 && row < that.rows ) {
+					cells.push( that.data[col][row] );
+				}
+			}
+			if ( cells.length >= 4 ) {
+				for ( i = 0; i < cells.length - 3; i++ ) {
+					var color = cells[i];
+					if ( color === undefined ) {
+						continue;
+					}
+					
+					if (
+						cells[i] === color &&
+						cells[i+1] === color &&
+						cells[i+2] === color &&
+						cells[i+3] === color
+					) {
+						return color;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	return checkDiagonalsInOneDirection( 1 ) || checkDiagonalsInOneDirection( -1 );
 };
 
 // Current player places a disc into the given column.
