@@ -331,10 +331,18 @@ function AIPlayer( id, name ) {
 // Inputs computer player's move. This is done after a delay of 200 ms to feel more natural to
 // humans playing or watching the game.
 AIPlayer.prototype.takeTurn = function ( board ) {
-	// Not a very smart opponent…
+	// Not a very smart opponent… it just chooses a random valid column and places a disc there.
 	var deferred = $.Deferred();
+	
+	var validColumns = board.data.map( function ( val, index ) {
+		return val.length === board.rows ? null : index;
+	} ).filter( function ( val ) {
+		return val !== null;
+	} );
+	
 	setTimeout( function () {
-		deferred.resolve( Math.floor( Math.random() * board.columns ) );
+		var column = validColumns[ Math.floor( Math.random() * validColumns.length ) ];
+		deferred.resolve( column );
 	}, 200 );
 	return deferred;
 };
