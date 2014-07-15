@@ -1,0 +1,13 @@
+.game-board { 
+	empty-cells: show;
+}
+
+.game-board td, .game-board th {
+	width: 30px;
+	height: 30px;
+	border: 1px solid black;
+}
+
+.game-board th {
+	background: gray;
+}

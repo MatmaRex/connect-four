@@ -1,6 +1,7 @@
 <html>
 <head>
 	<title>Connect Four</title>
+	<link rel="stylesheet" type="text/css" href="game.css">
 	<script type="text/javascript" src="jquery-1.11.1.js"></script>
 	<script type="text/javascript" src="game.js"></script>
 </head>
@@ -14,6 +15,6 @@
 	
 	<p>Drop your dots into the grid. Connect four (horizontally, vertically or diagonally) to win. Good luck!</p>
 	
-	<script type="text/javascript">(new Game('#game')).setUp();</script>
+	<script type="text/javascript">(new Game( $( '#game' ) )).setUp();</script>
 </body>
 </html>
